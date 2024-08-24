@@ -3,102 +3,82 @@
 #define ll long long
 using namespace std;
 int n,m;
-struct edge
+struct enode
 {
-	int to;
-	int nxt;
-	int val;
-} e[M<<1];
-int head[M],tot;
-void add(int u,int v,int val)
+	int to,nxt,val;
+}edge[M<<1];
+int hd[M],tot;
+void addedge(int u,int v,int w)
 {
-	e[++tot].to=v;
-	e[tot].nxt=head[u];
-	e[tot].val=val;
-	head[u]=tot;
+	edge[++tot].to=v;
+	edge[tot].val=w;
+	edge[tot].nxt=hd[u];
+	hd[u]=tot;
 }
 bool vis[M];
-int dia,dp[M];
-void dm(int u)
+int dia,f[M];
+void dfs_dia(int pos)
 {
-	vis[u]=1;
-	for(int i=head[u];i;i=e[i].nxt)
+	vis[pos]=1;
+	for(int i=hd[pos];i;i=edge[i].nxt)
 	{
-		int to=e[i].to;
-		int val=e[i].val;
-		if(vis[to]) continue;
-		dm(to);
-		dia=max(dia,dp[u]+dp[to]+val);
-		dp[u]=max(dp[u],dp[to]+val);
+		int v=edge[i].to;
+		if(vis[v])continue;
+		dfs_dia(v);
+		dia=max(dia,f[pos]+f[v]+edge[i].val);
+		f[pos]=max(f[pos],f[v]+edge[i].val);
 	}
 }
 struct node
 {
-	int cnt,edge;
-	node(int cnt1,int edge1)
-	{
-		cnt=cnt1;
-		edge=edge1;
-	}
+	int cnt,id;
+	node(int _cnt,int _id){cnt=_cnt,id=_id;}
 };
-int flg;
-node dfs(int x,int fa,int bl)
+bool fg;
+node dfs_check(int x,int fa,int pos)
 {
-	int cnt=0,edge=0;
-	multiset<int> mset;
-	for(int i=head[x];i;i=e[i].nxt)
+	int cnt=0,id=0;
+	multiset<int>mset;
+	for(int i=hd[x];i;i=edge[i].nxt)
 	{
-		int to=e[i].to;
-		int val=e[i].val;
-		if(to==fa)continue;
-		node son=dfs(to,x,bl);
-		if(val+son.edge>=bl)cnt++;
-		else mset.insert(val+son.edge);
-		cnt+=son.cnt;
+		int v=edge[i].to;
+		if(v==fa)continue;
+		node tp=dfs_check(v,x,pos);
+		if(edge[i].val+tp.id>=pos)++cnt;
+		else mset.insert(edge[i].val+tp.id);
+		cnt+=tp.cnt;
 	}
-	while (!mset.empty())
+	while(!mset.empty())
 	{
-		multiset<int>::iterator it=mset.upper_bound(0);
+		auto it=mset.upper_bound(0);
 		int top=*it;
 		mset.erase(it);
-		it=mset.lower_bound(bl-top);
-		if (it == mset.end()) edge=top;
-		else
-		{
-			mset.erase(it);
-			++cnt;
-		}
+		it=mset.lower_bound(pos-top);
+		if(it==mset.end())id=top;
+		else mset.erase(it),++cnt;
 	}
-	if (cnt >= m) flg=1;
-	return node(cnt,edge);
+	if(cnt>=m)fg=1;
+	return node(cnt,id);
 }
 int ans;
 int main()
 {
-	srand((time)(0));
+	srand(time(0));
 	scanf("%d%d",&n,&m);
-	for(int i=1,u,v,val;i<=n-1;i++)
+	for(int i=1,u,v,w;i<n;++i)
 	{
-		scanf("%d%d%d",&u,&v,&val);
-		add(u,v,val);
-		add(v,u,val);
+		scanf("%d%d%d",&u,&v,&w);
+		addedge(u,v,w),addedge(v,u,w);
 	}
-	dm(1);
-	int l=0,r=dia,mid;
+	dfs_dia(1);
+	int l=0,r=dia;
 	while(l<=r)
 	{
-		mid=(l+r)>>1;
-		flg=false;
-		dfs(1,0,mid);
-		if(flg)
-		{
-			l=mid+rand()%2;
-			ans=mid;
-		}
-		else
-		{
-			r=mid-rand()%2;
-		}
+		int mid=(l+r)>>1;
+		fg=0;
+		dfs_check(1,0,mid);
+		if(fg)l=mid+rand()%2,ans=mid;
+		else r=mid-rand()%2;
 	}
 	printf("%d",ans);
 	return 0;
