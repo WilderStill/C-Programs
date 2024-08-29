@@ -1,99 +1,113 @@
 #include<bits/stdc++.h>
-#define M 312940
+#define M 300010
 using namespace std;
+inline int read()
+{
+	int x=0,f=1;
+	char ch=getchar();
+	while(!isdigit(ch)){if(ch=='-')f=-1;ch=getchar();}
+	while(isdigit(ch))x=(x<<3)+(x<<1)+(ch^'0'),ch=getchar();
+	return x*f;
+}
+inline void write(int x)
+{
+    if(x<0)
+	{
+        putchar('-');
+        write(-x);
+        return;
+    }
+    if(x>9)write(x/10);
+    putchar(x%10+48);
+    return;
+}
 struct node
 {
-	int to,nxt,w;
-}e[M*2];
+	int to,nxt,val;
+}edge[M<<1];
 struct Node
 {
-	int u,v,Lca,Dis;
-}g[M*2];
-int sum,cnt=0,k,n,m,num[M],vis[M],tmp[M],head[M],d[M],dis[M],fa[M][25];
-void add(int u,int v,int w)
+	int from,to,lca,dis;
+}graph[M<<1];
+int hd[M],tot;
+inline void addedge(int u,int v,int w)
 {
-	k++;
-	e[k].to=v;
-	e[k].nxt=head[u];
-	e[k].w=w;
-	head[u]=k;
+	edge[++tot].to=v;
+	edge[tot].nxt=hd[u];
+	edge[tot].val=w;
+	hd[u]=tot;
 }
-void dfs(int x,int dep)
+int sum,tim,n,m,dfn[M],dep[M],dis[M],fa[M][25];
+bool vis[M];
+inline void dfs(int pos,int d)
 {
-	cnt++;
-	num[cnt]=x;
-	d[x]=dep;
-	vis[x]=1;
-	for(int i=1;i<25;i++)
-		fa[x][i]=fa[fa[x][i-1]][i-1];
-	for(int i=head[x];i>0;i=e[i].nxt)
+	dfn[++tim]=pos,dep[pos]=d,vis[pos]=1;
+	for(int i=1;i<25;++i)fa[pos][i]=fa[fa[pos][i-1]][i-1];
+	for(int i=hd[pos];i;i=edge[i].nxt)
 	{
-		int v=e[i].to;
+		int v=edge[i].to;
 		if(!vis[v])
 		{
-			fa[v][0]=x;
-			dis[v]=dis[x]+e[i].w;
-			dfs(v,dep+1);
+			fa[v][0]=pos;
+			dis[v]=dis[pos]+edge[i].val;
+			dfs(v,d+1);
 		}
 	}
 }
-int lca(int x,int y)
+inline int LCA(int x,int y)
 {
-	if(d[x]<d[y]) swap(x,y);
-	int t=d[x]-d[y];
-	for(int i=0;i<=24;i++)
-		if((1<<i)&t)
+	if(dep[x]<dep[y])swap(x,y);
+	int del=dep[x]-dep[y];
+	for(int i=0;i<25;++i)
+		if((1<<i)&del)
 			x=fa[x][i];
-	if(x==y) return x;
-	for(int i=24;i>=0;i--)
-		if(fa[x][i]!=fa[y][i])
-		{
-			x=fa[x][i];
-			y=fa[y][i];
-		}
+	if(x==y)return x;
+	for(int i=24;~i;--i)
+		if(fa[x][i]^fa[y][i])
+			x=fa[x][i],y=fa[y][i];
 	return fa[x][0];
 }
-bool check(int mid)
+int tp[M];
+inline bool check(int x)
 {
 	int cnt=0,ans=0;
-	memset(tmp,0,sizeof(tmp));
-	for(int i=1;i<=m;i++)
-		if(g[i].Dis>mid)
+	memset(tp,0,sizeof tp);
+	for(int i=1;i<=m;++i)
+		if(graph[i].dis>x)
 		{
-			tmp[g[i].u]++;tmp[g[i].v]++;tmp[g[i].Lca]-=2;
-			ans=max(ans,g[i].Dis-mid);
-			cnt++;
+			++tp[graph[i].from],--tp[graph[i].LCA];
+			++tp[graph[i].to],--tp[graph[i].LCA];
+			ans=max(ans,graph[i].dis-x);
+			++cnt;
 		}
-	if(!cnt) return true;
-	for(int i=n;i>=1;i--) tmp[fa[num[i]][0]]+=tmp[num[i]];
-	for(int i=2;i<=n;i++) if(tmp[i]==cnt&&dis[i]-dis[fa[i][0]]>=ans) return true;
-	return false;
+	if(!cnt)return 0;
+	for(int i=n;i;--i)tp[fa[dfn[i]][0]]+=tp[dfn[i]];
+	for(int i=2;i<=n;++i)if(tp[i]==cnt&&dis[i]-dis[fa[i][0]]>=ans)return 0;
+	return 1;
 }
 int main()
 {
-	scanf("%d%d",&n,&m);
-	for(int i=1,x,y,w;i<=n-1;i++)
+	n=read(),m=read();
+	for(int i=1;i<n;++i)
 	{
-		scanf("%d%d%d",&x,&y,&w);
-		add(x,y,w);
-		add(y,x,w);
+		int u=read(),v=read(),w=read();
+		addedge(u,v,w),addedge(v,u,w);
 		sum+=w;
 	}
-	dis[1]=0;
 	dfs(1,1);
-	for(int i=1;i<=m;i++)
+	for(int i=1;i<=m;++i)
 	{
-		scanf("%d%d",&g[i].u,&g[i].v);
-		g[i].Lca=lca(g[i].u,g[i].v);
-		g[i].Dis=dis[g[i].u]+dis[g[i].v]-2*dis[g[i].Lca];
+		graph[i].from=read(),graph[i].to=read();
+		graph[i].LCA=LCA(graph[i].from,graph[i].to);
+		graph[i].dis=dis[graph[i].from]+dis[graph[i].to]-(dis[graph[i].LCA]<<1);
 	}
 	int l=0,r=sum;
 	while(l<r)
 	{
-		int mid=(l+r)/2;
-		if(check(mid)) r=mid;
-		else l=mid+1;
+		int mid=(l+r)>>1;
+		if(check(mid))l=mid+1;
+		else r=mid;
 	}
-	printf("%d",l);
+	write(l);
 	return 0;
 }
