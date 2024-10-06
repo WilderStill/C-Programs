@@ -28,29 +28,30 @@ inline void write(int x)
     putchar(x%10+48);
     return;
 }
-map<int,string>mp;
-int tot;
 vector<int>v;
 int main()
 {
-	int n=read();
+	int n,minn=0,tot=0;
+	n=read(),minn=read();
+	v.reserve(100010);
 	for(int i=1;i<=n;++i)
 	{
-		string s;cin>>s;
-		mp[++tot]=s;
-		v.push_back(tot);
+		char op[2];
+		scanf("%s",op);
+		int k=read();
+		if(op[0]=='I')
+		{
+			if(k<minn)continue;
+			v.insert(lower_bound(v.begin(),v.end(),k),k); 
+		}
+		if(op[0]=='A')for(auto&i:v)i+=k;
+		if(op[0]=='S')for(int i=0;i<v.size();++i){v[i]-=k;if(v[i]<minn)v.erase(lower_bound(v.begin(),v.end(),v[i])),--i,++tot;}
+		if(op[0]=='F')
+		{
+			if(k>v.size())puts("-1");
+			else write(v[v.size()-k]),puts("");
+		}
 	}
-	int m=read();
-	for(int i=1;i<=m;++i)
-	{
-		
-		string s;cin>>s;
-		int pos=read();
-		mp[++tot]=s;
-		v.insert(v.begin()+pos,tot);
-	}
-	int q=read();
-	for(int i=1;i<=q;++i)cout<<mp[v[read()]],puts("");
+	write(tot);
 	return 0;
 }
-

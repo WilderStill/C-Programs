@@ -16,7 +16,7 @@ inline int read()
     }
     return x*f;
 }
-inline void write(int x)
+inline void write(long long x)
 {
     if(x<0)
 	{
@@ -28,29 +28,18 @@ inline void write(int x)
     putchar(x%10+48);
     return;
 }
-map<int,string>mp;
-int tot;
-vector<int>v;
+int s[100010],t[100010];
+long long ans;
 int main()
 {
-	int n=read();
-	for(int i=1;i<=n;++i)
-	{
-		string s;cin>>s;
-		mp[++tot]=s;
-		v.push_back(tot);
-	}
-	int m=read();
-	for(int i=1;i<=m;++i)
-	{
-		
-		string s;cin>>s;
-		int pos=read();
-		mp[++tot]=s;
-		v.insert(v.begin()+pos,tot);
-	}
-	int q=read();
-	for(int i=1;i<=q;++i)cout<<mp[v[read()]],puts("");
-	return 0;
+    int n=read(),m=read();
+    for(int i=1;i<=n;++i)s[i]=read(),t[i]=read();
+    for(int i=1;i<=n;++i)ans+=abs(t[i]-s[i]);
+    s[++n]=m,t[n]=0;
+    sort(s+1,s+n+1);
+	sort(t+1,t+n+1);
+    for(int i=1;i<=n;++i)ans+=abs(t[i]-s[i]);
+    write(ans);
+    return 0;
 }
 

@@ -1,8 +1,9 @@
 #include<bits/stdc++.h>
+#define ll long long
 using namespace std;
-inline int read()
+inline ll read()
 {
-    int x=0,f=1;
+    ll x=0,f=1;
     char ch=getchar();
     while(!isdigit(ch))
 	{
@@ -16,7 +17,7 @@ inline int read()
     }
     return x*f;
 }
-inline void write(int x)
+inline void write(ll x)
 {
     if(x<0)
 	{
@@ -28,29 +29,11 @@ inline void write(int x)
     putchar(x%10+48);
     return;
 }
-map<int,string>mp;
-int tot;
-vector<int>v;
 int main()
 {
-	int n=read();
-	for(int i=1;i<=n;++i)
-	{
-		string s;cin>>s;
-		mp[++tot]=s;
-		v.push_back(tot);
-	}
-	int m=read();
-	for(int i=1;i<=m;++i)
-	{
-		
-		string s;cin>>s;
-		int pos=read();
-		mp[++tot]=s;
-		v.insert(v.begin()+pos,tot);
-	}
-	int q=read();
-	for(int i=1;i<=q;++i)cout<<mp[v[read()]],puts("");
-	return 0;
+	//freopen("math.in","r",stdin);
+	//freopen("math.out","w",stdout);
+	ll a=read(),b=read();
+	write(a*b-a-b);
+    return 0;
 }
-

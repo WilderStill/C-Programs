@@ -28,29 +28,33 @@ inline void write(int x)
     putchar(x%10+48);
     return;
 }
-map<int,string>mp;
-int tot;
-vector<int>v;
+struct interval
+{
+	int l,r;
+	bool operator <(const interval&syh)const{return r<syh.l;}
+};
+set<interval>st;
 int main()
 {
 	int n=read();
 	for(int i=1;i<=n;++i)
 	{
-		string s;cin>>s;
-		mp[++tot]=s;
-		v.push_back(tot);
+		char op[2];
+		scanf("%s",op);
+		if(op[0]=='A')
+		{
+			int l=read(),r=read(),res=0;
+			auto p=st.find({l,r});
+			while(p!=st.end())
+			{
+				++res,st.erase(p);
+				p=st.find({l,r});
+			}
+			st.insert({l,r});
+			write(res),puts("");
+		}
+		else write(st.size()),puts("");
 	}
-	int m=read();
-	for(int i=1;i<=m;++i)
-	{
-		
-		string s;cin>>s;
-		int pos=read();
-		mp[++tot]=s;
-		v.insert(v.begin()+pos,tot);
-	}
-	int q=read();
-	for(int i=1;i<=q;++i)cout<<mp[v[read()]],puts("");
 	return 0;
 }
 

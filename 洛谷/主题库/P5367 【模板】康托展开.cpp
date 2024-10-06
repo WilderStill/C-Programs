@@ -1,5 +1,8 @@
 #include<bits/stdc++.h>
+#define int long long
+#define lowbit(x) ((x)&(-x)) 
 using namespace std;
+const int mod=998244353;
 inline int read()
 {
     int x=0,f=1;
@@ -28,29 +31,32 @@ inline void write(int x)
     putchar(x%10+48);
     return;
 }
-map<int,string>mp;
-int tot;
-vector<int>v;
-int main()
+int ans,n,tr[4001000],frac[4000100];
+inline void add(int x,int v)
 {
-	int n=read();
+	for(int i=x;i<=n;i+=lowbit(i))(tr[i]+=v)%=mod;
+}
+inline int query(int x)
+{
+	int res=0;
+	for(int i=x;i;i-=lowbit(i))(res+=tr[i])%=mod;
+	return res;
+}
+signed main()
+{
+	n=read();
+	frac[0]=1;
 	for(int i=1;i<=n;++i)
 	{
-		string s;cin>>s;
-		mp[++tot]=s;
-		v.push_back(tot);
+		tr[i]=lowbit(i); 
+		frac[i]=(frac[i-1]*i)%mod;
 	}
-	int m=read();
-	for(int i=1;i<=m;++i)
+	for(int i=1;i<=n;++i)
 	{
-		
-		string s;cin>>s;
-		int pos=read();
-		mp[++tot]=s;
-		v.insert(v.begin()+pos,tot);
+		int x=read();
+		add(x,-1);
+		ans=(ans+query(x)*frac[n-i]%mod)%mod;
 	}
-	int q=read();
-	for(int i=1;i<=q;++i)cout<<mp[v[read()]],puts("");
-	return 0;
+	write(ans+1);
+    return 0;
 }
-
